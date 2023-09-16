@@ -1,0 +1,59 @@
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.custom-table th, .custom-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.custom-table th {
+  background-color: #f2f2f2;
+}
+
+.custom-file-upload input[type="file"]{
+    display: none;
+}
+
+.custom-file-upload {
+  border: 2px solid #ccc;
+  display: inline-block;
+  padding: 8px 16px;
+  cursor: pointer;
+  background-color: #f8f8f8;
+  color: #333;
+  border-radius: 4px;
+  font-size: 12px;
+  text-align: center;
+  margin-left: 10px;
+}
+
+.download {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.file-upload{
+  display: flex;
+  gap: 10px;
+}
+
+.filename{
+  font-size: 12px;
+}
+
+.button{
+  margin-left: 80%;
+  margin-top: -5%;
+}
+
+.content{
+  text-align: center;
+}
