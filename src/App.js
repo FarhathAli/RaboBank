@@ -30,7 +30,7 @@ function App() {
           toast.error("Unsupported file format. Please upload a CSV or XML file.");
         }
       };
-      fileReader.readAsText(file);
+      fileReader.readAsText(file,"ISO-8859-1");
     }
   };
 
