@@ -1,3 +1,12 @@
+.text {
+  text-align: center;
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+body{
+  background: linear-gradient(0.25turn, #e66465,#9198e5);
+}
 .custom-table {
   width: 100%;
   border-collapse: collapse;
@@ -17,6 +26,10 @@
 .custom-file-upload input[type="file"]{
     display: none;
 }
+.file-upload{
+  display: flex;
+  justify-content: center;
+}
 
 .custom-file-upload {
   border: 2px solid #ccc;
@@ -29,15 +42,17 @@
   font-size: 12px;
   text-align: center;
   margin-left: 10px;
+  height: 15px;
 }
 
 .download {
-  margin-top: 20px;
-  padding: 10px 20px;
+  margin-top: 30%;
+  padding: 8px 16px;
   background-color: #28a745;
   color: #fff;
   border: none;
   cursor: pointer;
+  border-radius: 5px;
 }
 
 .file-upload{
@@ -56,4 +71,12 @@
 
 .content{
   text-align: center;
+}
+.error-message {
+  color: red;
+  font-size: 14px;
+}
+
+.error{
+  margin-top: 1%;
 }

@@ -11,6 +11,7 @@ function App() {
   const [fileData, setFileData] = useState(null);
   const [validationReport, setValidationReport] = useState([]);
   const [selectedFileName, setSelectedFileName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   //uploading a file
   const handleFileChange = (event) => {
@@ -24,15 +25,20 @@ function App() {
         const fileContent = e.target.result;
         if (file.name.endsWith(".csv")) {
           parseCSV(fileContent);
+          setErrorMessage("");
         } else if (file.name.endsWith(".xml")) {
           parseXML(fileContent);
+          setErrorMessage("");
         } else {
-          toast.error("Unsupported file format. Please upload a CSV or XML file.");
+          setErrorMessage(
+            "Unsupported file format. Please upload a CSV or XML file."
+          );
         }
       };
-      fileReader.readAsText(file,"ISO-8859-1");
+      fileReader.readAsText(file, "ISO-8859-1");
     }
   };
+  console.log("fileData", fileData)
 
   //CSV sheet
   const parseCSV = (fileContent) => {
@@ -63,34 +69,48 @@ function App() {
     }
   };
 
-  //Validation of CSV format
+  // Validation of CSV format
   const validateCSVData = (data) => {
-    const transactionReferences = new Set();
-    const failedRecords = [];
+  const transactionReferences = new Set();
+  const failedRecords = [];
 
-    data.forEach((record) => {
-      console.log("record",record)
-      const { Reference, Description, "End Balance" : EndBalance} = record;
+  data.forEach((record) => {
+    console.log("record", record);
+    const { Reference, Description, "End Balance": EndBalance, "Start Balance": StartBalance, Mutation } = record;
+
+    if (StartBalance && Mutation && EndBalance) {
+      const startBalanceFloat = parseFloat(StartBalance.replace(',', '').trim());
+      const mutationFloat = parseFloat(Mutation.replace(',', '').trim());
+      const endBalanceFloat = parseFloat(EndBalance.replace(',', '').trim());
+
       let remarks = "";
 
+      if (Math.abs(endBalanceFloat - (startBalanceFloat + mutationFloat)) > 0.001) {
+        remarks += "End Balance Error";
+      }
+
       if (transactionReferences.has(Reference)) {
-        remarks = "Duplicate Reference";
+        if (remarks !== "") {
+          remarks += " ";
+        }
+        remarks += "Duplicate Reference";
       } else {
         transactionReferences.add(Reference);
       }
 
-      if (remarks === "Duplicate Reference") {
+      // Display the record only if there are any remarks
+      if (remarks !== "") {
         failedRecords.push({
           Reference,
           Description,
-          EndBalance,
-          Remarks: remarks
+          Remarks: remarks,
         });
       }
-    });
+    }
+  });
 
-    setValidationReport(failedRecords);
-  };
+  setValidationReport(failedRecords);
+};
 
   //Validation of XML format
   const validateXMLData = (xml) => {
@@ -101,7 +121,9 @@ function App() {
     xml.children.forEach((child) => {
       const reference = child.attributes.reference;
       const descriptionNode = child.children.find((description) => description.name === "description").value;
-      const endNode = child.children.find((endBalance) => endBalance.name === "endBalance").value;
+      const startBalance = parseFloat(child.children.find((startBalance) => startBalance.name === "startBalance").value);
+      const mutation = parseFloat(child.children.find((mutation) => mutation.name === "mutation").value);
+      const endNode = parseFloat(child.children.find((endBalance) => endBalance.name === "endBalance").value);
 
       let remarks = "";
 
@@ -109,17 +131,21 @@ function App() {
         remarks = "Duplicate Reference";
       } else {
         transactionReferences.add(reference);
-        remarks = "No duplicate reference found";
+
+       // Compare end balance with start balance + mutation
+      if (Math.abs(endNode - (startBalance + mutation)) > 0.001) {
+        remarks = "End Balance Error";
       }
 
-      failedRecords.push({
-        Reference: reference,
-        Description: descriptionNode,
-        EndBalance : endNode,
-        Remarks: remarks
-      });
+      if (remarks === "End Balance Error") {
+        failedRecords.push({
+          Reference: reference,
+          Description: descriptionNode,
+          Remarks: remarks,
+        });
+      }
+      }
     });
-
     setValidationReport(failedRecords);
   };
 
@@ -130,7 +156,13 @@ function App() {
       return;
     }
 
-    const ws = XLSX.utils.json_to_sheet(validationReport);
+    const modifiedValidationReport = validationReport.map((record) => ({
+    "Transaction Reference": record.Reference,
+    Description: record.Description,
+    "Error Description": record.Remarks,
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(modifiedValidationReport);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Validation Report");
     const excelBuffer = XLSX.write(wb, {
@@ -149,26 +181,24 @@ function App() {
       <div className="file-upload">
         <label className="custom-file-upload">
           <input type="file" accept=".csv, .xml" onChange={handleFileChange} />
-          Choose File
+          Validate the Sheet
         </label>
         <p className="filename">Selected File: {selectedFileName}</p>
       </div>
-
+      <div className='error'>
+      {errorMessage && (
+            <span className="error-message">{errorMessage}</span>
+          )}
+        </div>
       {validationReport.length > 0 && (
         <div>
           <h2 className='content'>Validation Report</h2>
-          <div className="button">
-          <button className="download" onClick={downloadReport}>
-            Download Validation Report
-          </button>
-          </div>
           <table className="custom-table">
             <thead>
               <tr>
                 <th>Transaction Reference</th>
                 <th>Description</th>
-                <th>End Balance</th>
-                <th>Remarks</th>
+                <th>Error Description</th>
               </tr>
             </thead>
             <tbody>
@@ -176,12 +206,16 @@ function App() {
                 <tr key={index}>
                   <td>{record.Reference}</td>
                   <td>{record.Description}</td>
-                  <td>{record.EndBalance}</td>
                   <td>{record.Remarks}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <div className="button">
+            <button className="download" onClick={downloadReport}>
+              Download Validation Report
+            </button>
+          </div>
         </div>
       )}
       <ToastContainer position="top-right" />
