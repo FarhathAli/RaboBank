@@ -1,0 +1,82 @@
+.text {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  
+  body{
+    background: linear-gradient(0.25turn, #e66465,#9198e5);
+  }
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .custom-table th, .custom-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .custom-table th {
+    background-color: #f2f2f2;
+  }
+  
+  .custom-file-upload input[type="file"]{
+      display: none;
+  }
+  .file-upload{
+    display: flex;
+    justify-content: center;
+  }
+  
+  .custom-file-upload {
+    border: 2px solid #ccc;
+    display: inline-block;
+    padding: 8px 16px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #333;
+    border-radius: 4px;
+    font-size: 12px;
+    text-align: center;
+    margin-left: 10px;
+    height: 15px;
+  }
+  
+  .download {
+    margin-top: 30%;
+    padding: 8px 16px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .file-upload{
+    display: flex;
+    gap: 10px;
+  }
+  
+  .filename{
+    font-size: 12px;
+  }
+  
+  .button{
+    margin-left: 80%;
+    margin-top: -5%;
+  }
+  
+  .content{
+    text-align: center;
+  }
+  .error-message {
+    color: red;
+    font-size: 14px;
+  }
+  
+  .error{
+    margin-top: 1%;
+  }
